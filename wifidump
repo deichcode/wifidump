@@ -1,7 +1,7 @@
 #!/bin/sh
 #author: minus42
 
-echo "Generating dump, plaeas hold the line!"
+echo "Generating dump, please hold the line!"
 
 name=$(networksetup -getcomputername)
 interface=$(networksetup -listallhardwareports | cut -d : -f2 -s | grep -A 1 Wi-Fi | sed -n 2p | sed  s/\ //g)
@@ -10,7 +10,6 @@ ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Curr
 bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
 tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
 channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
-#bandwidth=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:"| awk '{print $2}' | awk -F ',' '{print $2}')
 iperf=$(exec iperf3 -c linux.uni-koblenz.de | grep " receiver" | awk '{print $7 " " $8}')
 
 if [ $channel -lt 36 ]
@@ -29,7 +28,6 @@ echo SSID: $ssid
 echo Frequency: $frequency
 echo Channel: $channel
 echo TxRate: $tx_rate MBit/s
-#echo Bandwidth: $bandwidth MHz
 echo
 echo "# iperf #"
 echo Performance: $iperf
