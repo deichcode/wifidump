@@ -19,14 +19,19 @@ if [ $channel -lt 36 ]
 fi
 
 echo
+echo "# Device #"
 echo Name: $name
 echo MAC: $own_mac
-echo SSID: $ssid
+echo
+echo "# Access Point #"
 echo BSSID: $bssid
-echo TxRate: $tx_rate MBit/s
+echo SSID: $ssid
 echo Frequency: $frequency
 echo Channel: $channel
+echo TxRate: $tx_rate MBit/s
 #echo Bandwidth: $bandwidth MHz
+echo
+echo "# iperf #"
 echo Performance: $iperf
 echo
 echo proudly presented by minus42
