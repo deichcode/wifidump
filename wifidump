@@ -6,12 +6,12 @@ echo "Generating dump, plaeas hold the line!"
 name=$(networksetup -getcomputername)
 interface=$(networksetup -listallhardwareports | cut -d : -f2 -s | grep -A 1 Wi-Fi | sed -n 2p | sed  s/\ //g)
 own_mac=$(ipconfig getpacket $interface | sed -n 12p | cut -c 10-27)
-ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | sed -n 13p |  cut -d: -f 2)
-bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | sed -n 12p |  cut -d: -f 2-7)
-tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | sed -n 7p |  cut -d: -f 2)
-channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | sed -n 15p |  cut -d: -f 2 |cut -d, -f 1)
-bandwidth=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | sed -n 15p |  cut -d: -f 2 |cut -d, -f 2)
-iperf=$(exec iperf3 -c linux.uni-koblenz.de | sed -n 16p | cut -d ' ' -f13-14)
+ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " SSID:" | awk '{print $2}')
+bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
+tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
+channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
+bandwidth=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:"| awk '{print $2}' | awk -F ',' '{print $2}')
+iperf=$(exec iperf3 -c linux.uni-koblenz.de | grep " receiver" | awk '{print $7 " " $8}')
 
 if [ $channel -lt 36 ]
 	then frequency="2,4 GHz"
