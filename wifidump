@@ -10,7 +10,7 @@ ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Curr
 bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
 tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
 channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
-bandwidth=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:"| awk '{print $2}' | awk -F ',' '{print $2}')
+#bandwidth=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:"| awk '{print $2}' | awk -F ',' '{print $2}')
 iperf=$(exec iperf3 -c linux.uni-koblenz.de | grep " receiver" | awk '{print $7 " " $8}')
 
 if [ $channel -lt 36 ]
@@ -26,7 +26,7 @@ echo BSSID: $bssid
 echo TxRate: $tx_rate MBit/s
 echo Frequency: $frequency
 echo Channel: $channel
-echo Bandwidth: $bandwidth MHz
+#echo Bandwidth: $bandwidth MHz
 echo Performance: $iperf
 echo
 echo proudly presented by minus42
