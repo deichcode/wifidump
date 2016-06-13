@@ -24,6 +24,7 @@ echo
 echo "# Timestamp #"
 echo Date: $now1
 echo Time: $now2
+echo
 echo Name: $name
 echo MAC: $own_mac
 echo SSID: $ssid
