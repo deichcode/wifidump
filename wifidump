@@ -3,6 +3,8 @@
 
 echo "Generating dump, please hold the line!"
 
+now1=$(date +"%d.%m.%Y")
+now2=$(date +"%H:%M")
 name=$(networksetup -getcomputername)
 interface=$(networksetup -listallhardwareports | cut -d : -f2 -s | grep -A 1 Wi-Fi | sed -n 2p | sed  s/\ //g)
 own_mac=$(ipconfig getpacket $interface | sed -n 12p | cut -c 10-27)
@@ -17,6 +19,10 @@ if [ $channel -lt 36 ]
 	else frequency="5 GHz"
 fi
 
+echo
+echo "# Timestamp #"
+echo Date: $now1
+echo Time: $now2
 echo
 echo "# Device #"
 echo Name: $name
