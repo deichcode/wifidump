@@ -12,12 +12,9 @@ tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/C
 channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
 iperf=$(exec iperf3 -c linux.uni-koblenz.de 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
 #iperf=$(exec iperf3 -c localhost 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
-#echo $iperf
-if [ $? == 1 ]
-	echo ""
-	#@sören ohne das leere echo über dieser Zeile funktioniert es nicht! KEINE AHNUNG warum!
+iperf_error=$(</tmp/wifidump_error.txt)
+if [ -n "$iperf_error" ]
 	then iperf=$(</tmp/wifidump_error.txt)
-#	echo $iperf
 fi
 
 rm /tmp/wifidump_error.txt
