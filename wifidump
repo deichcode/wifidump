@@ -12,7 +12,13 @@ ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Curr
 bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
 tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
 channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
-iperf=$(exec iperf3 -c linux.uni-koblenz.de | grep " receiver" | awk '{print $7 " " $8}')
+iperf=$(exec iperf3 -c linux.uni-koblenz.de 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
+iperf_error=$(</tmp/wifidump_error.txt)
+if [ -n "$iperf_error" ]
+	then iperf=$(</tmp/wifidump_error.txt)
+fi
+
+rm /tmp/wifidump_error.txt
 
 if [ $channel -lt 36 ]
 	then frequency="2,4 GHz"
