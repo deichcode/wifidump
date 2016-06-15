@@ -18,8 +18,8 @@ Several options are available using the command line:
 
 ### 0.3
 - change parsing line selection from sed to grep
-- remove bandwidth becaue of wrong and unimportant imformation
-- add som styling
+- remove __bandwidth__ because of wrong and unimportant imformation
+- add some styling
 - wording
 - adding time and date
 - catching iperf errors
