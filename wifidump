@@ -1,6 +1,6 @@
 #!/bin/sh
 #author: minus42
-version="Version: 0.3"
+version="Version: 0.4"
 if [[ $1 ]]
 then
 	if [ $1 = "-v" ]
