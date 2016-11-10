@@ -16,6 +16,13 @@ Several options are available using the command line:
 
 ## versions
 
+### 0.4
+
+- add support for linux based operating systems
+
+Thanks to:
+niyawe
+
 ### 0.3
 - change parsing line selection from sed to grep
 - remove __bandwidth__ because of wrong and unimportant imformation
