@@ -13,22 +13,36 @@ then
 	fi
 fi
 
-
 echo "Generating dump, please hold the line!"
 
 now1=$(date +"%d.%m.%Y")
 now2=$(date +"%H:%M")
-name=$(networksetup -getcomputername)
-interface=$(networksetup -listallhardwareports | cut -d : -f2 -s | grep -A 1 Wi-Fi | sed -n 2p | sed  s/\ //g)
-own_mac=$(ipconfig getpacket $interface | sed -n 12p | cut -c 10-27)
-ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " SSID:" | awk '{print $2}')
-bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
-tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
-channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
+
+sys=`uname -s`
+if [ x$sys = xDarwin ] ; then
+	name=$(networksetup -getcomputername)
+	interface=$(networksetup -listallhardwareports | cut -d : -f2 -s | grep -A 1 Wi-Fi | sed -n 2p | sed  s/\ //g)
+	own_mac=$(ipconfig getpacket $interface | sed -n 12p | cut -c 10-27)
+	ssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " SSID:" | awk '{print $2}')
+	bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
+	tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
+	channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
+fi
+
+if [ x$sys = xLinux ]; then
+	name=$(hostname)
+	interface=$(iw dev | grep Interface | awk '{print $2}')
+	own_mac=$(iw dev $interface info | grep addr | awk '{print $2}')
+	ssid=$(iw dev $interface link | grep SSID | awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+	bssid=$(iw dev $interface link | grep 'Connected to' | awk '{print $3}')
+	tx_rate=$(iw dev $interface link | grep 'tx bitrate' | awk '{print $3}')
+	channel=$(iw dev $interface info | grep channel | awk '{print $2}')
+fi
+
 iperf=$(exec iperf3 -c linux.uni-koblenz.de 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
 iperf_error=$(</tmp/wifidump_error.txt)
-if [ -n "$iperf_error" ]
-	then iperf=$(</tmp/wifidump_error.txt)
+if [ -n "$iperf_error" ]; then
+	iperf=$(</tmp/wifidump_error.txt)
 fi
 
 rm /tmp/wifidump_error.txt
