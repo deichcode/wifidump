@@ -53,12 +53,27 @@ elif [ x$sys = xCYGWIN_NT-10.0-WOW ] ; then
 	channel=$(netsh wlan show interfaces | grep 'Kanal' | awk '{print $3}')
 fi
 
-iperf=$(exec iperf3 -c linux.uni-koblenz.de 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
-iperf_error=$(</tmp/wifidump_error.txt)
-
-if [ -n "$iperf_error" ]; then
-	iperf=$(</tmp/wifidump_error.txt)
+IPERF=()
+if [ "$internal_iperf" = true ]; then
+	IPERF+=($internal_iperf_address)
 fi
+if [ "$external_iperf" = true ]; then
+	IPERF+=($external_iperf_address)
+fi
+
+IPERFRESULT=()
+IPERFTIME=()
+for i in "${IPERF[@]}"
+do
+	start=$SECONDS
+	iperf=$(exec iperf3 -c $internal_iperf_address 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
+	IPERFTIME+=($(($SECONDS - $start)))
+		iperf_error=$(</tmp/wifidump_error.txt)
+		if [ -n "$iperf_error" ]; then
+			iperf=$(</tmp/wifidump_error.txt)
+		fi
+	IPERFRESULT+=("$iperf")
+done
 
 rm /tmp/wifidump_error.txt
 
@@ -82,8 +97,13 @@ echo SSID: $ssid
 echo Frequency: $frequency
 echo Channel: $channel
 echo TxRate: $tx_rate MBit/s
-echo
-echo "# iperf #"
-echo Performance: $iperf
+for i in "${!IPERFRESULT[@]}"
+do
+	echo
+	echo "# iperf ${IPERF[$i]} #"
+	echo Performance: "${IPERFRESULT[$i]}"
+	echo Elapsed Time: "$((${IPERFTIME[$i]}/60)) min $((${IPERFTIME[$i]}%60)) sec" 
+done
 echo
 echo proudly presented by minus42
+
