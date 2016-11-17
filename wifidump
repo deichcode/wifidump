@@ -23,8 +23,8 @@ done
 
 echo "Generating dump, please hold the line!"
 
-now1=$(date +"%d.%m.%Y")
-now2=$(date +"%H:%M")
+timestamp_date=$(date +"%d.%m.%Y")
+timestamp_time=$(date +"%H:%M")
 
 sys=`uname -s`
 if [ x$sys = xDarwin ] ; then
@@ -69,8 +69,8 @@ fi
 
 echo
 echo "# Timestamp #"
-echo Date: $now1
-echo Time: $now2
+echo Date: $timestamp_date
+echo Time: $timestamp_time
 echo
 echo "# Device #"
 echo Name: $name
