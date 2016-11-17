@@ -27,9 +27,7 @@ if [ x$sys = xDarwin ] ; then
 	bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
 	tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
 	channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
-fi
-
-if [ x$sys = xLinux ]; then
+elif [ x$sys = xLinux ]; then
 	name=$(hostname)
 	interface=$(iw dev | grep Interface | awk '{print $2}')
 	own_mac=$(iw dev $interface info | grep addr | awk '{print $2}')
@@ -37,10 +35,19 @@ if [ x$sys = xLinux ]; then
 	bssid=$(iw dev $interface link | grep 'Connected to' | awk '{print $3}')
 	tx_rate=$(iw dev $interface link | grep 'tx bitrate' | awk '{print $3}')
 	channel=$(iw dev $interface info | grep channel | awk '{print $2}')
+elif [ x$sys = xCYGWIN_NT-10.0-WOW ] ; then
+	name=$(hostname)
+	interface=$(netsh wlan show interfaces | grep 'Beschreibung' | awk -F : '{print $2}' | sed -e :a -e 's/^.\{1,77\}$/ &/;ta' -e 's/\( *\)\1/\1/')
+	own_mac=$(netsh wlan show interfaces | grep 'Physische Adresse' | awk '{print $4}')
+	ssid=$(netsh wlan show interfaces | grep -w 'SSID' | awk '{print $3}')
+	bssid=$(netsh wlan show interfaces | grep 'BSSID' | awk '{print $3}')
+	tx_rate=$(netsh wlan show interfaces | grep 'bertragungsrate' | awk '{print $4}')
+	channel=$(netsh wlan show interfaces | grep 'Kanal' | awk '{print $3}')
 fi
 
 iperf=$(exec iperf3 -c linux.uni-koblenz.de 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
 iperf_error=$(</tmp/wifidump_error.txt)
+
 if [ -n "$iperf_error" ]; then
 	iperf=$(</tmp/wifidump_error.txt)
 fi
