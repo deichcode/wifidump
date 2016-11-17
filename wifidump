@@ -66,12 +66,12 @@ IPERFTIME=()
 for i in "${IPERF[@]}"
 do
 	start=$SECONDS
-	iperf=$(exec iperf3 -c $internal_iperf_address 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
+	iperf=$(exec iperf3 -c $i 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
 	IPERFTIME+=($(($SECONDS - $start)))
-		iperf_error=$(</tmp/wifidump_error.txt)
-		if [ -n "$iperf_error" ]; then
-			iperf=$(</tmp/wifidump_error.txt)
-		fi
+	iperf_error=$(</tmp/wifidump_error.txt)
+	if [ -n "$iperf_error" ]; then
+		iperf=$(</tmp/wifidump_error.txt)
+	fi
 	IPERFRESULT+=("$iperf")
 done
 
