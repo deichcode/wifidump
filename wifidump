@@ -1,17 +1,25 @@
 #!/bin/sh
 #author: minus42
-version= 0.4
-if [[ $1 ]]
-then
-	if [ $1 = "-v" ]
-	then
-		echo "Wifidump:" $version
-		exit
-	else
-		echo "only -v or no parameter allowed"
-		exit
-	fi
-fi
+version="0.4"
+internal_iperf=false
+internal_iperf_address="linux.uni-koblenz.de"
+external_iperf=false
+external_iperf_address="s1.niyawe.de"
+
+
+while [ "$1" != "" ]; do
+	case $1 in
+		-v | --version )	echo "Wifidump:" $version
+							exit
+							;;
+		-i | --internal )	internal_iperf=true
+							;;
+		-e | --external )	external_iperf=true
+							;;
+		* )					exit 1
+	esac
+	shift
+done
 
 echo "Generating dump, please hold the line!"
 
