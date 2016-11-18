@@ -6,9 +6,23 @@ internal_iperf_address="linux.uni-koblenz.de"
 external_iperf=false
 external_iperf_address="s1.niyawe.de"
 
+display_help() {
+
+echo "usage: $(basename "$0") [-h] [-v] [-i] [-e] -- A small script that dump some wifi data to check connection at university Koblenz. The script requires iperf3"
+echo ""
+echo "where:"
+echo " -h  show this help text"
+echo " -v  show version"
+echo " -i  use uni-koblenz internal iperf3 Server to check internal connection speed"
+echo " -e  use niyawe external iperf3 Server to check Internet connection speed"
+
+}
 
 while [ "$1" != "" ]; do
 	case $1 in
+		-h | --help )		display_help
+							exit
+							;;
 		-v | --version )	echo "Wifidump:" $version
 							exit
 							;;
