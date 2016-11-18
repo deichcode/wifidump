@@ -73,9 +73,9 @@ do
 		iperf=$(</tmp/wifidump_error.txt)
 	fi
 	IPERFRESULT+=("$iperf")
+	rm /tmp/wifidump_error.txt
 done
 
-rm /tmp/wifidump_error.txt
 
 if [ $channel -lt 36 ]
 	then frequency="2,4 GHz"
