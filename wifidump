@@ -65,6 +65,9 @@ elif [ x$sys = xCYGWIN_NT-10.0-WOW ] ; then
 	bssid=$(netsh wlan show interfaces | grep 'BSSID' | awk '{print $3}')
 	tx_rate=$(netsh wlan show interfaces | grep 'bertragungsrate' | awk '{print $4}')
 	channel=$(netsh wlan show interfaces | grep 'Kanal' | awk '{print $3}')
+else
+	echo "Sorry, but we are not supporting your os at this time."
+	exit 1
 fi
 
 IPERF=()
