@@ -1,22 +1,44 @@
 #!/bin/sh
 #author: minus42
-version="Version: 0.4"
-if [[ $1 ]]
-then
-	if [ $1 = "-v" ]
-	then
-		echo $version
-		exit
-	else
-		echo "only -v or no parameter allowed"
-		exit
-	fi
-fi
+version="0.5"
+internal_iperf=false
+internal_iperf_address="linux.uni-koblenz.de"
+external_iperf=false
+external_iperf_address="s1.niyawe.de"
+
+display_help() {
+
+echo "usage: $(basename "$0") [-h] [-v] [-i] [-e] -- A small script that dump some wifi data to check connection at university Koblenz. The script requires iperf3"
+echo ""
+echo "where:"
+echo " -h, --help       show this help text"
+echo " -v, --version    show version"
+echo " -i, --internal   use uni-koblenz internal iperf3 Server to check internal connection speed"
+echo " -e, --external   use niyawe external iperf3 Server to check Internet connection speed"
+
+}
+
+while [ "$1" != "" ]; do
+	case $1 in
+		-h | --help )		display_help
+							exit
+							;;
+		-v | --version )	echo "Wifidump:" $version
+							exit
+							;;
+		-i | --internal )	internal_iperf=true
+							;;
+		-e | --external )	external_iperf=true
+							;;
+		* )					exit 128
+	esac
+	shift
+done
 
 echo "Generating dump, please hold the line!"
 
-now1=$(date +"%d.%m.%Y")
-now2=$(date +"%H:%M")
+timestamp_date=$(date +"%d.%m.%Y")
+timestamp_time=$(date +"%H:%M")
 
 sys=`uname -s`
 if [ x$sys = xDarwin ] ; then
@@ -27,9 +49,7 @@ if [ x$sys = xDarwin ] ; then
 	bssid=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " BSSID:" | awk '{print $2}')
 	tx_rate=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " lastTxRate:" | awk '{print $2}')
 	channel=$(exec /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport --getinfo | grep " channel:" | awk '{print $2}' | awk -F ',' '{print $1}')
-fi
-
-if [ x$sys = xLinux ]; then
+elif [ x$sys = xLinux ]; then
 	name=$(hostname)
 	interface=$(iw dev | grep Interface | awk '{print $2}')
 	own_mac=$(iw dev $interface info | grep addr | awk '{print $2}')
@@ -37,15 +57,44 @@ if [ x$sys = xLinux ]; then
 	bssid=$(iw dev $interface link | grep 'Connected to' | awk '{print $3}')
 	tx_rate=$(iw dev $interface link | grep 'tx bitrate' | awk '{print $3}')
 	channel=$(iw dev $interface info | grep channel | awk '{print $2}')
+elif [ x$sys = xCYGWIN_NT-10.0-WOW ] ; then
+	name=$(hostname)
+	interface=$(netsh wlan show interfaces | grep 'Beschreibung' | awk -F : '{print $2}' | sed -e :a -e 's/^.\{1,77\}$/ &/;ta' -e 's/\( *\)\1/\1/')
+	own_mac=$(netsh wlan show interfaces | grep 'Physische Adresse' | awk '{print $4}')
+	ssid=$(netsh wlan show interfaces | grep -w 'SSID' | awk '{print $3}')
+	bssid=$(netsh wlan show interfaces | grep 'BSSID' | awk '{print $3}')
+	tx_rate=$(netsh wlan show interfaces | grep 'bertragungsrate' | awk '{print $4}')
+	channel=$(netsh wlan show interfaces | grep 'Kanal' | awk '{print $3}')
+else
+	echo "Sorry, but we are not supporting your os at this time."
+	exit 1
 fi
 
-iperf=$(exec iperf3 -c linux.uni-koblenz.de 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
-iperf_error=$(</tmp/wifidump_error.txt)
-if [ -n "$iperf_error" ]; then
-	iperf=$(</tmp/wifidump_error.txt)
+IPERF=()
+if [ "$internal_iperf" = true ]; then
+	IPERF+=($internal_iperf_address)
+fi
+if [ "$external_iperf" = true ]; then
+	IPERF+=($external_iperf_address)
 fi
 
-rm /tmp/wifidump_error.txt
+IPERFRESULT=()
+IPERFTIME=()
+for i in "${IPERF[@]}"
+do
+	start=$SECONDS
+	iperf=$(exec iperf3 -c $i 2> /tmp/wifidump_error.txt | grep " receiver" | awk '{print $7 " " $8}')
+	IPERFTIME+=($(($SECONDS - $start)))
+	iperf_error=$(</tmp/wifidump_error.txt)
+	if [ -n "$iperf_error" ]; then
+		iperf=$(</tmp/wifidump_error.txt)
+	fi
+	IPERFRESULT+=("$iperf")
+done
+
+if [ -f /tmp/wifidump_error.txt ]; then
+	rm /tmp/wifidump_error.txt
+fi
 
 if [ $channel -lt 36 ]
 	then frequency="2,4 GHz"
@@ -54,8 +103,8 @@ fi
 
 echo
 echo "# Timestamp #"
-echo Date: $now1
-echo Time: $now2
+echo Date: $timestamp_date
+echo Time: $timestamp_time
 echo
 echo "# Device #"
 echo Name: $name
@@ -67,8 +116,12 @@ echo SSID: $ssid
 echo Frequency: $frequency
 echo Channel: $channel
 echo TxRate: $tx_rate MBit/s
-echo
-echo "# iperf #"
-echo Performance: $iperf
+for i in "${!IPERFRESULT[@]}"
+do
+	echo
+	echo "# iperf ${IPERF[$i]} #"
+	echo Performance: "${IPERFRESULT[$i]}"
+	echo Elapsed Time: "$((${IPERFTIME[$i]}/60)) min $((${IPERFTIME[$i]}%60)) sec" 
+done
 echo
 echo proudly presented by minus42
