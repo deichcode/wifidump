@@ -11,10 +11,10 @@ display_help() {
 echo "usage: $(basename "$0") [-h] [-v] [-i] [-e] -- A small script that dump some wifi data to check connection at university Koblenz. The script requires iperf3"
 echo ""
 echo "where:"
-echo " -h  show this help text"
-echo " -v  show version"
-echo " -i  use uni-koblenz internal iperf3 Server to check internal connection speed"
-echo " -e  use niyawe external iperf3 Server to check Internet connection speed"
+echo " -h, --help       show this help text"
+echo " -v, --version    show version"
+echo " -i, --internal   use uni-koblenz internal iperf3 Server to check internal connection speed"
+echo " -e, --external   use niyawe external iperf3 Server to check Internet connection speed"
 
 }
 
@@ -89,7 +89,7 @@ do
 	IPERFRESULT+=("$iperf")
 done
 
-if [ -f /tmp/wifidump_error.txt]; then
+if [ -f /tmp/wifidump_error.txt ]; then
 	rm /tmp/wifidump_error.txt
 fi
 
