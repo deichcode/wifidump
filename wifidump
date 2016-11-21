@@ -30,7 +30,7 @@ while [ "$1" != "" ]; do
 							;;
 		-e | --external )	external_iperf=true
 							;;
-		* )					exit 1
+		* )					exit 128
 	esac
 	shift
 done
@@ -125,4 +125,3 @@ do
 done
 echo
 echo proudly presented by minus42
-
