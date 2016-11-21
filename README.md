@@ -11,17 +11,23 @@ install wifidump via homebrew:
 ## commandline options
 Several options are available using the command line:
 
-    -v            show current version
-
+    -v | --version     show current version
+    -i | --internal    run (university) internal iperf performance test
+    -e | --external    run (university) external iperf performance test
+    -h | --help        show help
 
 ## versions
+
+### 0.5
+
+- add Windows 10 cygwin support
+- add several options to controll iperf
+- add external iperf 
+- add help
 
 ### 0.4
 
 - add support for linux based operating systems
-
-Thanks to:
-niyawe
 
 ### 0.3
 - change parsing line selection from sed to grep
@@ -46,3 +52,8 @@ niyawe
   * connections __bandwidth__
   * __iperf__ result summary
 - provide via homebrew
+
+
+## Thanks to
+
+@ironbiff, @niyawe, @matrode
